@@ -1,7 +1,7 @@
 import { Instagram } from "lucide-react";
 
 const INSTAGRAM_URL =
-  import.meta.env.VITE_INSTAGRAM_URL || "https://instagram.com/brukernavn";
+  import.meta.env.VITE_INSTAGRAM_URL || "https://instagram.com/evig_eventyr";
 
 const InstagramButton = () => {
   return (
