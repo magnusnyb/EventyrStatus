@@ -7,10 +7,7 @@ const Index = () => {
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="flex w-full max-w-sm flex-col items-center gap-6">
         {/* Avatar / Brand */}
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-20 w-20 rounded-full bg-secondary flex items-center justify-center text-3xl">
-            👋
-          </div>
+        <div className="flex flex-col items-center gap-1">
           <h1 className="text-2xl font-bold tracking-tight">Evig_eventyr</h1>
           <p className="text-sm text-muted-foreground text-center">If you want to get in touch you can reach me here!</p>
         </div>
