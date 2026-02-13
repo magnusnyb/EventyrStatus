@@ -8,9 +8,9 @@ const WhatsAppButton = () => {
       href={`https://wa.me/${WHATSAPP_NUMBER}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex w-full items-center justify-center gap-3 rounded-xl bg-whatsapp px-6 py-4 text-lg font-semibold text-whatsapp-foreground transition-all hover:brightness-110 active:scale-[0.98]"
+      className="flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm text-muted-foreground transition-all hover:text-foreground hover:border-whatsapp/50 active:scale-[0.98]"
     >
-      <MessageCircle className="h-6 w-6" />
+      <MessageCircle className="h-4 w-4" />
       WhatsApp
     </a>
   );
