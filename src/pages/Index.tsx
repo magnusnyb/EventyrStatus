@@ -1,6 +1,6 @@
 import StatusCard from "@/components/StatusCard";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import InstagramButton from "@/components/InstagramButton";
+import InstagramPreview from "@/components/InstagramPreview";
 
 const Index = () => {
   return (
@@ -11,17 +11,19 @@ const Index = () => {
           <div className="h-20 w-20 rounded-full bg-secondary flex items-center justify-center text-3xl">
             👋
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Hei!</h1>
-          <p className="text-sm text-muted-foreground">Ta kontakt med meg</p>
+          <h1 className="text-2xl font-bold tracking-tight">Evig_eventyr</h1>
+          <p className="text-sm text-muted-foreground text-center">If you want to get in touch you can reach me here!</p>
         </div>
 
         {/* Status */}
         <StatusCard />
 
+        {/* Instagram Preview */}
+        <InstagramPreview />
+
         {/* Links */}
         <div className="flex w-full flex-col gap-3">
           <WhatsAppButton />
-          <InstagramButton />
         </div>
       </div>
     </div>
