@@ -29,14 +29,12 @@ const StatusCard = () => {
 
   if (!status || !status.active) return null;
 
-  const expiresAt = status.expires_at
-    ? new Date(status.expires_at).toLocaleString("nb-NO", {
-        day: "numeric",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : null;
+  const postedAt = new Date().toLocaleString("nb-NO", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   // Split message by newlines for safe rendering
   const lines = (status.message || "").split("\n");
@@ -51,11 +49,9 @@ const StatusCard = () => {
           </span>
         ))}
       </div>
-      {expiresAt && (
-        <p className="mt-2 text-xs text-muted-foreground">
-          Utløper: {expiresAt}
-        </p>
-      )}
+      <p className="mt-2 text-xs text-muted-foreground">
+        Posted: {postedAt}
+      </p>
     </div>
   );
 };
