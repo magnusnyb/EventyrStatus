@@ -1,4 +1,5 @@
 import { Instagram, ExternalLink } from "lucide-react";
+import profileImg from "@/assets/profile.jpeg";
 import insta1 from "@/assets/insta-1.jpeg";
 import insta2 from "@/assets/insta-2.jpeg";
 import insta3 from "@/assets/insta-3.jpeg";
@@ -17,9 +18,11 @@ const InstagramPreview = () => {
     <div className="w-full rounded-xl border border-border bg-card p-4 flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-tr from-instagram-from to-instagram-to">
-          <Instagram className="h-5 w-5 text-instagram-foreground" />
-        </div>
+        <img
+          src={profileImg}
+          alt="Profilbilde"
+          className="h-9 w-9 rounded-full object-cover"
+        />
         <div className="flex flex-col">
           <span className="text-sm font-semibold text-foreground">@evig_eventyr</span>
           <span className="text-xs text-muted-foreground">Instagram</span>
