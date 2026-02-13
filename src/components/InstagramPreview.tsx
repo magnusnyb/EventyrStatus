@@ -1,12 +1,15 @@
 import { Instagram, ExternalLink } from "lucide-react";
+import insta1 from "@/assets/insta-1.jpeg";
+import insta2 from "@/assets/insta-2.jpeg";
+import insta3 from "@/assets/insta-3.jpeg";
 
 const INSTAGRAM_URL =
   import.meta.env.VITE_INSTAGRAM_URL || "https://instagram.com/evig_eventyr";
 
-const placeholderPosts = [
-  { id: 1, gradient: "from-rose-500/30 to-amber-500/30" },
-  { id: 2, gradient: "from-violet-500/30 to-pink-500/30" },
-  { id: 3, gradient: "from-cyan-500/30 to-blue-500/30" },
+const posts = [
+  { id: 1, src: insta1, alt: "Skiing in the mountains" },
+  { id: 2, src: insta2, alt: "Ford Explorer in snow" },
+  { id: 3, src: insta3, alt: "Muflon trailer in the Alps" },
 ];
 
 const InstagramPreview = () => {
@@ -25,13 +28,21 @@ const InstagramPreview = () => {
 
       {/* Post grid */}
       <div className="grid grid-cols-3 gap-2">
-        {placeholderPosts.map((post) => (
-          <div
+        {posts.map((post) => (
+          <a
             key={post.id}
-            className={`aspect-square rounded-lg bg-gradient-to-br ${post.gradient} bg-secondary flex items-center justify-center`}
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="aspect-square rounded-lg overflow-hidden"
           >
-            <Instagram className="h-5 w-5 text-muted-foreground/50" />
-          </div>
+            <img
+              src={post.src}
+              alt={post.alt}
+              className="h-full w-full object-cover transition-transform hover:scale-105"
+              loading="lazy"
+            />
+          </a>
         ))}
       </div>
 
