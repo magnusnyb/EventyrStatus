@@ -1,4 +1,3 @@
-import StatusCard from "@/components/StatusCard";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import InstagramPreview from "@/components/InstagramPreview";
 import profileImg from "@/assets/profile.jpeg";
@@ -17,9 +16,6 @@ const Index = () => {
           <h1 className="text-2xl font-bold tracking-tight">Evig eventyr 🇳🇴</h1>
           <p className="text-sm text-muted-foreground text-center">Hey there, get in touch with me here (or just look at the pretty pictures, I don't mind) </p>
         </div>
-
-        {/* Status */}
-        <StatusCard />
 
         {/* Instagram Preview */}
         <InstagramPreview />
