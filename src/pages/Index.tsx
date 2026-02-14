@@ -4,7 +4,7 @@ import profileImg from "@/assets/profile.jpeg";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12">
+    <div className="flex min-h-svh items-center justify-center px-4 py-6">
       <div className="flex w-full max-w-sm flex-col items-center gap-6">
         {/* Avatar / Brand */}
         <div className="flex flex-col items-center gap-2">
