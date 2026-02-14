@@ -14,7 +14,7 @@ const Index = () => {
             className="h-24 w-24 rounded-full object-cover border-2 border-border"
           />
           <h1 className="text-2xl font-bold tracking-tight">Evig eventyr 🇳🇴</h1>
-          <p className="text-sm text-muted-foreground text-center">Hey there, get in touch with me here </br>(or just look at the pretty pictures, I don't mind) </p>
+          <p className="text-sm text-muted-foreground text-center">Hey there, get in touch with me here <br/>(or just look at the pretty pictures, I don't mind) </p>
         </div>
 
         {/* Instagram Preview */}
