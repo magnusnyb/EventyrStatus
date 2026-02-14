@@ -13,9 +13,8 @@ before_script:
 
 build:
   stage: build
-  variables:
-    VITE_BASE_PATH: "/$CI_PROJECT_NAME/"
   script:
+    - export VITE_BASE_PATH="/${CI_PROJECT_NAME}/"
     - npm run build
     - mv dist public
   artifacts:
