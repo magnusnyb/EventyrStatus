@@ -29,7 +29,7 @@ const Index = () => {
             className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <Phone className="h-4 w-4" />
-            +47 994 76 190
+            +47 99476190
           </a>
         </div>
       </div>
