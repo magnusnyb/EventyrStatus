@@ -1,3 +1,4 @@
+import { Phone } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import InstagramPreview from "@/components/InstagramPreview";
 import profileImg from "@/assets/profile.jpeg";
@@ -23,6 +24,13 @@ const Index = () => {
         {/* Links */}
         <div className="flex w-full flex-col gap-3">
           <WhatsAppButton />
+          <a
+            href="tel:+4799476190"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <Phone className="h-4 w-4" />
+            Call me maybe · +47 994 76 190
+          </a>
         </div>
       </div>
     </div>
