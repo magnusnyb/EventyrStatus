@@ -1,7 +1,7 @@
 import { Phone } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import InstagramPreview from "@/components/InstagramPreview";
-import profileImg from "@/assets/profile.jpeg";
+import profileImg from "@/assets/profile-main.jpeg";
 
 const Index = () => {
   return (
