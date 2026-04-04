@@ -50,6 +50,7 @@ Deno.serve(async (req) => {
       message,
       created_at: now.toISOString(),
       expires_at: expiresAt.toISOString(),
+      likes: 0,
     }).eq('id', 1)
 
     const tidspunkt = expiresAt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
@@ -65,6 +66,7 @@ Deno.serve(async (req) => {
       message,
       created_at: new Date().toISOString(),
       expires_at: null,
+      likes: 0,
     }).eq('id', 1)
     await reply(chatId, 'Melding satt (ingen utløp).')
     return new Response('OK')

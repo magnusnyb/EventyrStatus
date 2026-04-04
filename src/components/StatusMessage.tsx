@@ -7,6 +7,7 @@ interface Status {
   created_at: string | null
   expires_at: string | null
   likes: number
+  total_likes: number
 }
 
 function formatTimestamp(iso: string): string {
@@ -25,7 +26,7 @@ const StatusMessage = () => {
   useEffect(() => {
     supabase
       .from('status')
-      .select('message, created_at, expires_at, likes')
+      .select('message, created_at, expires_at, likes, total_likes')
       .eq('id', 1)
       .single()
       .then(({ data }) => {
@@ -46,7 +47,7 @@ const StatusMessage = () => {
     await supabase.rpc('increment_status_likes')
     localStorage.setItem(`liked_${status.created_at}`, '1')
     setLiked(true)
-    setStatus((s) => s ? { ...s, likes: s.likes + 1 } : s)
+    setStatus((s) => s ? { ...s, likes: s.likes + 1, total_likes: s.total_likes + 1 } : s)
   }
 
   return (
@@ -57,17 +58,19 @@ const StatusMessage = () => {
         {status.created_at && (
           <p className="text-xs text-yellow-700">{formatTimestamp(status.created_at)}</p>
         )}
-        <button
-          onClick={handleLike}
-          disabled={liked}
-          className="flex items-center gap-1 text-xs text-yellow-700 transition-colors hover:text-red-500 disabled:cursor-default disabled:text-red-400"
-        >
-          <Heart
-            className="h-3.5 w-3.5"
-            fill={liked ? 'currentColor' : 'none'}
-          />
-          {status.likes > 0 && <span>{status.likes}</span>}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleLike}
+            disabled={liked}
+            className="flex items-center gap-1 text-xs text-yellow-700 transition-colors hover:text-red-500 disabled:cursor-default disabled:text-red-400"
+          >
+            <Heart
+              className="h-3.5 w-3.5"
+              fill={liked ? 'currentColor' : 'none'}
+            />
+            {status.likes > 0 && <span>{status.likes}</span>}
+          </button>
+        </div>
       </div>
     </div>
   )
