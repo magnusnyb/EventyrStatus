@@ -122,4 +122,4 @@ supabase functions deploy telegram-webhook --no-verify-jwt  # Deploy Edge Functi
 - `src/components/ui/` er generert av shadcn — unngå manuelle endringer her
 - Routing: legg nye ruter i `src/App.tsx` over catch-all `*`-ruten
 - Deployet via GitHub Pages — kjører kun fra `main`-branch
-- Aktiv branch: `CoffeeFix`
+- Aktiv branch: `main`
