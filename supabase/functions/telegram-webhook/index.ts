@@ -6,6 +6,14 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 
+async function logStatus(supabase: ReturnType<typeof createClient>, message: string, createdAt: Date, expiresAt: Date | null) {
+  await supabase.from('status_log').insert({
+    message,
+    created_at: createdAt.toISOString(),
+    expires_at: expiresAt?.toISOString() ?? null,
+  })
+}
+
 async function reply(chatId: string, text: string) {
   await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
     method: 'POST',
@@ -51,6 +59,7 @@ Deno.serve(async (req) => {
         expires_at: expiresAt.toISOString(),
         likes: 0,
       }).eq('id', 1)
+      await logStatus(supabase, message, now, expiresAt)
       const tidspunkt = expiresAt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
       await reply(chatId, `Melding satt — utløper kl. ${tidspunkt} (${hours}t).`)
       return new Response('OK')
@@ -70,6 +79,7 @@ Deno.serve(async (req) => {
         expires_at: expiresAt.toISOString(),
         likes: 0,
       }).eq('id', 1)
+      await logStatus(supabase, message, now, expiresAt)
       const dato = expiresAt.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit' })
       await reply(chatId, `Melding satt — utløper ${dato} (${days} dager).`)
       return new Response('OK')
@@ -135,16 +145,43 @@ Deno.serve(async (req) => {
     return new Response('OK')
   }
 
+  // /historikk
+  if (text.trim() === '/historikk') {
+    const { data } = await supabase
+      .from('status_log')
+      .select('message, created_at')
+      .order('created_at', { ascending: false })
+      .limit(10)
+
+    if (!data || data.length === 0) {
+      await reply(chatId, 'Ingen meldinger i loggen ennå.')
+      return new Response('OK')
+    }
+
+    const lines = data.map((row: { message: string; created_at: string }) => {
+      const dato = new Date(row.created_at).toLocaleString('no-NO', {
+        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+      })
+      const kort = row.message.length > 50 ? row.message.slice(0, 50) + '…' : row.message
+      return `${dato} — ${kort}`
+    })
+
+    await reply(chatId, lines.join('\n'))
+    return new Response('OK')
+  }
+
   // /sett [tekst]
   const settMatch = text.match(/^\/sett\s+([\s\S]+)$/s)
   if (settMatch) {
     const message = settMatch[1].trim()
+    const now = new Date()
     await supabase.from('status').update({
       message,
-      created_at: new Date().toISOString(),
+      created_at: now.toISOString(),
       expires_at: null,
       likes: 0,
     }).eq('id', 1)
+    await logStatus(supabase, message, now, null)
     await reply(chatId, 'Melding satt (ingen utløp).')
     return new Response('OK')
   }
@@ -156,6 +193,7 @@ Deno.serve(async (req) => {
     '/2dag–/14dag [tekst] — utløper etter 2–14 dager',
     '/ext 2t — forleng gjeldende melding',
     '/a — vis statistikk',
+    '/historikk — vis siste 10 meldinger',
     '/slett — fjern melding',
   ].join('\n'))
 

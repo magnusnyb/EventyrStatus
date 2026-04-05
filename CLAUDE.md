@@ -90,6 +90,16 @@ supabase/
 
 RLS: anon-brukere kan kun inserere, ikke lese.
 
+### Tabell: `status_log`
+| Kolonne | Type | Beskrivelse |
+|---|---|---|
+| id | bigint | Auto-generert primærnøkkel |
+| message | text | Meldingsteksten |
+| created_at | timestamptz | Tidspunkt melding ble postet |
+| expires_at | timestamptz | Utløpstidspunkt, null = ingen utløp |
+
+Én rad per melding som settes via Telegram. Slettes aldri automatisk — brukes av `/historikk`.
+
 ### RPC-funksjoner
 - `increment_status_likes()` — øker `likes` og `total_likes` med 1 (kalles av `like-status` edge function)
 - `get_analytics_summary()` — returnerer JSON med sidevisninger (dag/uke/totalt) og klikk per knapp (kalles av `/analytics`-kommandoen)
@@ -105,6 +115,7 @@ RLS: anon-brukere kan kun inserere, ikke lese.
 | `/ext Nt` | Forlenger gjeldende melding med N timer |
 | `/ext Ndag` | Forlenger gjeldende melding med N dager |
 | `/a` | Viser sidevisninger og klikk-statistikk |
+| `/historikk` | Viser de siste 10 meldingene med timestamp |
 | `/slett` | Fjerner aktiv melding |
 
 ### Oppsett
