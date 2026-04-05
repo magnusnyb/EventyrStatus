@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
   }
 
   // /forleng Nt eller /forleng Ndag(er)
-  const forlengMatch = text.match(/^\/forleng\s+(\d+)(t|dag(?:er)?)$/i)
+  const forlengMatch = text.match(/^\/ext\s+(\d+)(t|dag(?:er)?)$/i)
   if (forlengMatch) {
     const num = parseInt(forlengMatch[1], 10)
     const unit = forlengMatch[2].toLowerCase()
@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
   }
 
   // /analytics
-  if (text.trim() === '/analytics') {
+  if (text.trim() === '/a') {
     const { data } = await supabase.rpc('get_analytics_summary')
     if (!data) {
       await reply(chatId, 'Ingen data ennå.')
@@ -124,6 +124,7 @@ Deno.serve(async (req) => {
     await reply(chatId, [
       'Sidevisninger i dag: ' + data.visninger_i_dag,
       'Sidevisninger denne uken: ' + data.visninger_uke,
+      'Sidevisninger denne måneden: ' + data.visninger_maned,
       'Sidevisninger totalt: ' + data.visninger_totalt,
       '',
       'Klikk Instagram: ' + data.klikk_instagram,
@@ -153,8 +154,8 @@ Deno.serve(async (req) => {
     '/sett [tekst] — statisk melding (ingen utløp)',
     '/1t–/24t [tekst] — utløper etter 1–24 timer',
     '/2dag–/14dag [tekst] — utløper etter 2–14 dager',
-    '/forleng 2t — forleng gjeldende melding',
-    '/analytics — vis statistikk',
+    '/ext 2t — forleng gjeldende melding',
+    '/a — vis statistikk',
     '/slett — fjern melding',
   ].join('\n'))
 

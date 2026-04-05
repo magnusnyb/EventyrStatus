@@ -102,9 +102,9 @@ RLS: anon-brukere kan kun inserere, ikke lese.
 | `/sett [tekst]` | Statisk melding uten utløp |
 | `/Nt [tekst]` | Melding med N timers utløp (N = 1–24) |
 | `/Ndag [tekst]` | Melding med N dagers utløp (N = 2–14) |
-| `/forleng Nt` | Forlenger gjeldende melding med N timer |
-| `/forleng Ndag` | Forlenger gjeldende melding med N dager |
-| `/analytics` | Viser sidevisninger og klikk-statistikk |
+| `/ext Nt` | Forlenger gjeldende melding med N timer |
+| `/ext Ndag` | Forlenger gjeldende melding med N dager |
+| `/a` | Viser sidevisninger og klikk-statistikk |
 | `/slett` | Fjerner aktiv melding |
 
 ### Oppsett
