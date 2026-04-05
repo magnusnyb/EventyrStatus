@@ -44,25 +44,24 @@ const StatusMessage = () => {
 
   const handleLike = async () => {
     if (liked || !status.created_at) return
-    await supabase.rpc('increment_status_likes')
     localStorage.setItem(`liked_${status.created_at}`, '1')
     setLiked(true)
     setStatus((s) => s ? { ...s, likes: s.likes + 1, total_likes: s.total_likes + 1 } : s)
+    await supabase.functions.invoke('like-status')
   }
 
   return (
-    <div className="w-full rounded-xl border border-yellow-300 bg-yellow-100 px-4 py-3">
-      <p className="text-xs font-semibold text-yellow-800 mb-1">Magnus</p>
-      <p className="text-sm text-yellow-950">{status.message}</p>
-      <div className="mt-2 flex items-center justify-between">
+    <div className="w-full rounded-xl border border-border bg-secondary px-4 py-3">
+      <p className="text-sm text-card-foreground mb-2">{status.message}</p>
+      <div className="flex items-center justify-between">
         {status.created_at && (
-          <p className="text-xs text-yellow-700">{formatTimestamp(status.created_at)}</p>
+          <p className="text-xs text-muted-foreground">Magnus · {formatTimestamp(status.created_at)}</p>
         )}
         <div className="flex items-center gap-3">
           <button
             onClick={handleLike}
             disabled={liked}
-            className="flex items-center gap-1 text-xs text-yellow-700 transition-colors hover:text-red-500 disabled:cursor-default disabled:text-red-400"
+            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-red-500 disabled:cursor-default disabled:text-red-400"
           >
             <Heart
               className="h-3.5 w-3.5"

@@ -80,11 +80,10 @@ supabase/
 | Kommando | Handling |
 |---|---|
 | `/sett [tekst]` | Statisk melding uten utløp |
-| `/1t [tekst]` | Melding med 1 times utløp |
-| `/3t [tekst]` | Melding med 3 timers utløp |
-| `/6t [tekst]` | Melding med 6 timers utløp |
-| `/12t [tekst]` | Melding med 12 timers utløp |
-| `/24t [tekst]` | Melding med 24 timers utløp |
+| `/Nt [tekst]` | Melding med N timers utløp (N = 1–24) |
+| `/Ndag [tekst]` | Melding med N dagers utløp (N = 2–14) |
+| `/forleng Nt` | Forlenger gjeldende melding med N timer |
+| `/forleng Ndag` | Forlenger gjeldende melding med N dager |
 | `/slett` | Fjerner aktiv melding |
 
 ### Oppsett

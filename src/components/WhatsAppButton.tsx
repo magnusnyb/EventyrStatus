@@ -1,3 +1,5 @@
+import { trackEvent } from "@/lib/analytics";
+
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || "4799476190";
 
 const WhatsAppButton = () => {
@@ -6,7 +8,8 @@ const WhatsAppButton = () => {
       href={`https://wa.me/${WHATSAPP_NUMBER}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center justify-center gap-2 rounded-xl bg-secondary border border-[#25D366] px-4 py-2.5 text-sm font-medium text-secondary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+      onClick={() => trackEvent('click_whatsapp')}
+      className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366]/10 px-4 py-2.5 text-sm font-medium transition-all hover:opacity-90 active:scale-[0.98]"
     >
       {/* Kun telefon-ikonet i hvit — grønn bakgrunn er knappen selv */}
       <svg width="20" height="20" viewBox="0 0 175.216 175.552" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

@@ -5,7 +5,6 @@ const ALLOWED_CHAT_ID = Deno.env.get('TELEGRAM_CHAT_ID')!
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-const HOURS: Record<string, number> = { '1t': 1, '3t': 3, '6t': 6, '12t': 12, '24t': 24 }
 
 async function reply(chatId: string, text: string) {
   await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -38,23 +37,100 @@ Deno.serve(async (req) => {
     return new Response('OK')
   }
 
-  // /1t /3t /6t /12t [tekst]
-  const timedMatch = text.match(/^\/(\d+t)\s+([\s\S]+)$/s)
-  if (timedMatch && HOURS[timedMatch[1]]) {
-    const hours = HOURS[timedMatch[1]]
-    const message = timedMatch[2].trim()
-    const now = new Date()
-    const expiresAt = new Date(now.getTime() + hours * 60 * 60 * 1000)
+  // /Nt eller /Ndag(er) — valgfritt antall timer (1–24) eller dager (2–14)
+  const hoursMatch = text.match(/^\/(\d+)t\s+([\s\S]+)$/s)
+  if (hoursMatch) {
+    const hours = parseInt(hoursMatch[1], 10)
+    if (hours >= 1 && hours <= 24) {
+      const message = hoursMatch[2].trim()
+      const now = new Date()
+      const expiresAt = new Date(now.getTime() + hours * 60 * 60 * 1000)
+      await supabase.from('status').update({
+        message,
+        created_at: now.toISOString(),
+        expires_at: expiresAt.toISOString(),
+        likes: 0,
+      }).eq('id', 1)
+      const tidspunkt = expiresAt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
+      await reply(chatId, `Melding satt — utløper kl. ${tidspunkt} (${hours}t).`)
+      return new Response('OK')
+    }
+  }
 
-    await supabase.from('status').update({
-      message,
-      created_at: now.toISOString(),
-      expires_at: expiresAt.toISOString(),
-      likes: 0,
-    }).eq('id', 1)
+  const daysMatch = text.match(/^\/(\d+)dag(?:er)?\s+([\s\S]+)$/si)
+  if (daysMatch) {
+    const days = parseInt(daysMatch[1], 10)
+    if (days >= 2 && days <= 14) {
+      const message = daysMatch[2].trim()
+      const now = new Date()
+      const expiresAt = new Date(now.getTime() + days * 24 * 60 * 60 * 1000)
+      await supabase.from('status').update({
+        message,
+        created_at: now.toISOString(),
+        expires_at: expiresAt.toISOString(),
+        likes: 0,
+      }).eq('id', 1)
+      const dato = expiresAt.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit' })
+      await reply(chatId, `Melding satt — utløper ${dato} (${days} dager).`)
+      return new Response('OK')
+    }
+  }
 
-    const tidspunkt = expiresAt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
-    await reply(chatId, `Melding satt — utløper kl. ${tidspunkt}.`)
+  // /forleng Nt eller /forleng Ndag(er)
+  const forlengMatch = text.match(/^\/forleng\s+(\d+)(t|dag(?:er)?)$/i)
+  if (forlengMatch) {
+    const num = parseInt(forlengMatch[1], 10)
+    const unit = forlengMatch[2].toLowerCase()
+    const isHours = unit === 't'
+    const isDays = unit.startsWith('dag')
+
+    const ok = (isHours && num >= 1 && num <= 24) || (isDays && num >= 1 && num <= 14)
+    if (ok) {
+      const { data: current } = await supabase
+        .from('status')
+        .select('message, expires_at')
+        .eq('id', 1)
+        .single()
+
+      if (!current?.message) {
+        await reply(chatId, 'Ingen aktiv melding å forlenge.')
+        return new Response('OK')
+      }
+
+      const base = current.expires_at ? new Date(current.expires_at) : new Date()
+      const ms = isHours ? num * 60 * 60 * 1000 : num * 24 * 60 * 60 * 1000
+      const newExpiry = new Date(base.getTime() + ms)
+
+      await supabase.from('status').update({ expires_at: newExpiry.toISOString() }).eq('id', 1)
+
+      if (isHours) {
+        const tidspunkt = newExpiry.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
+        await reply(chatId, `Forlenget med ${num}t — utløper nå kl. ${tidspunkt}.`)
+      } else {
+        const dato = newExpiry.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit' })
+        await reply(chatId, `Forlenget med ${num} dag${num > 1 ? 'er' : ''} — utløper nå ${dato}.`)
+      }
+      return new Response('OK')
+    }
+  }
+
+  // /analytics
+  if (text.trim() === '/analytics') {
+    const { data } = await supabase.rpc('get_analytics_summary')
+    if (!data) {
+      await reply(chatId, 'Ingen data ennå.')
+      return new Response('OK')
+    }
+    await reply(chatId, [
+      'Sidevisninger i dag: ' + data.visninger_i_dag,
+      'Sidevisninger denne uken: ' + data.visninger_uke,
+      'Sidevisninger totalt: ' + data.visninger_totalt,
+      '',
+      'Klikk Instagram: ' + data.klikk_instagram,
+      'Klikk Vipps: ' + data.klikk_vipps,
+      'Klikk WhatsApp: ' + data.klikk_whatsapp,
+      'Klikk telefon: ' + data.klikk_telefon,
+    ].join('\n'))
     return new Response('OK')
   }
 
@@ -74,12 +150,11 @@ Deno.serve(async (req) => {
 
   await reply(chatId, [
     'Ukjent kommando. Tilgjengelige kommandoer:',
-    '/sett [tekst] — statisk melding',
-    '/1t [tekst] — utløper etter 1 time',
-    '/3t [tekst] — utløper etter 3 timer',
-    '/6t [tekst] — utløper etter 6 timer',
-    '/12t [tekst] — utløper etter 12 timer',
-    '/24t [tekst] — utløper etter 24 timer',
+    '/sett [tekst] — statisk melding (ingen utløp)',
+    '/1t–/24t [tekst] — utløper etter 1–24 timer',
+    '/2dag–/14dag [tekst] — utløper etter 2–14 dager',
+    '/forleng 2t — forleng gjeldende melding',
+    '/analytics — vis statistikk',
     '/slett — fjern melding',
   ].join('\n'))
 

@@ -1,10 +1,14 @@
+import { useEffect } from "react";
 import { Phone } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import VippsButton from "@/components/VippsButton";
 import InstagramPreview from "@/components/InstagramPreview";
 import StatusMessage from "@/components/StatusMessage";
+import { trackEvent } from "@/lib/analytics";
 
 const Index = () => {
+  useEffect(() => { trackEvent('page_view') }, [])
+
   return (
     <div className="flex min-h-svh items-center justify-center px-4 py-6">
       <div className="flex w-full max-w-sm flex-col items-center gap-6">
@@ -22,6 +26,7 @@ const Index = () => {
           <WhatsAppButton />
           <a
             href="tel:+4799476190"
+            onClick={() => trackEvent('click_phone')}
             className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <Phone className="h-4 w-4" />

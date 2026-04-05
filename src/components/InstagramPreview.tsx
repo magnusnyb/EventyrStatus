@@ -1,4 +1,5 @@
 import { Instagram } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import profileImg from "@/assets/profile.jpeg";
 import insta1 from "@/assets/insta-1.jpeg";
 import insta2 from "@/assets/insta-2.jpeg";
@@ -19,6 +20,7 @@ const InstagramPreview = () => {
       href={INSTAGRAM_URL}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackEvent('click_instagram')}
       className="w-full rounded-xl border border-border bg-card p-4 flex flex-col gap-4 transition-all hover:border-instagram-from active:scale-[0.98]"
     >
       {/* Header */}
@@ -28,10 +30,7 @@ const InstagramPreview = () => {
           alt="Profilbilde"
           className="h-9 w-9 rounded-full object-cover"
         />
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold text-foreground">@evig_eventyr</span>
-          <span className="text-xs text-muted-foreground">Instagram</span>
-        </div>
+        <span className="text-base font-semibold text-foreground">@evig_eventyr</span>
         <span className="ml-auto flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-instagram-from to-instagram-to px-3 py-1.5 text-xs font-semibold text-instagram-foreground">
           <Instagram className="h-3.5 w-3.5" />
           Instagram
