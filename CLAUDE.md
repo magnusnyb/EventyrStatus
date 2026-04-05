@@ -28,9 +28,11 @@ src/
   lib/
     utils.ts      # cn() hjelper for Tailwind-klasser
     supabase.ts   # Supabase-klient
+    analytics.ts  # trackEvent() — fire-and-forget klikk/sidevisningssporing
 supabase/
   functions/
     telegram-webhook/  # Edge Function — mottar Telegram-meldinger og oppdaterer status
+    like-status/       # Edge Function — øker likes og sender Telegram-varsling
 ```
 
 ## Komponenter og design
@@ -51,8 +53,7 @@ supabase/
 - Vises øverst på siden, skjult når ingen aktiv melding
 - Subtil gul styling: `bg-yellow-100 border-yellow-300`
 - Viser: "Magnus" som avsender, meldingstekst, timestamp
-- Hjerte-knapp for likes — teller per melding, nullstilles ved ny melding
-- Total likes-teller viser akkumulert antall på tvers av alle meldinger
+- Hjerte-knapp for likes — kaller `like-status` edge function (øker teller + sender Telegram-varsling)
 - Likes-state lagres i `localStorage` for å hindre doble likes
 
 ### Subtitle
@@ -71,8 +72,27 @@ supabase/
 | likes | integer | Likes på inneværende melding, nullstilles ved ny melding |
 | total_likes | integer | Akkumulert antall likes, nullstilles aldri |
 
-### RPC: `increment_status_likes()`
-Øker både `likes` og `total_likes` med 1. Kjøres av frontend via `supabase.rpc()`.
+### Tabell: `analytics`
+| Kolonne | Type | Beskrivelse |
+|---|---|---|
+| id | bigint | Auto-generert primærnøkkel |
+| event | text | Hendelsesnavn (se under) |
+| created_at | timestamptz | Tidspunkt for hendelsen |
+
+**Hendelsnavn:**
+| Event | Trigger |
+|---|---|
+| `page_view` | Siden lastes |
+| `click_instagram` | Klikk på Instagram-boksen |
+| `click_vipps` | Klikk på Vipps-knappen |
+| `click_whatsapp` | Klikk på WhatsApp-knappen |
+| `click_phone` | Klikk på telefonnummeret |
+
+RLS: anon-brukere kan kun inserere, ikke lese.
+
+### RPC-funksjoner
+- `increment_status_likes()` — øker `likes` og `total_likes` med 1 (kalles av `like-status` edge function)
+- `get_analytics_summary()` — returnerer JSON med sidevisninger (dag/uke/totalt) og klikk per knapp (kalles av `/analytics`-kommandoen)
 
 ## Telegram-bot
 
@@ -84,11 +104,23 @@ supabase/
 | `/Ndag [tekst]` | Melding med N dagers utløp (N = 2–14) |
 | `/forleng Nt` | Forlenger gjeldende melding med N timer |
 | `/forleng Ndag` | Forlenger gjeldende melding med N dager |
+| `/analytics` | Viser sidevisninger og klikk-statistikk |
 | `/slett` | Fjerner aktiv melding |
 
 ### Oppsett
 - Bot-token og chat-ID lagres som secrets i Supabase Edge Functions
 - Webhook registrert mot `https://rssqefoufbaaeubpacrg.supabase.co/functions/v1/telegram-webhook`
+- Deploy: `supabase functions deploy telegram-webhook --no-verify-jwt`
+
+## Edge Functions
+
+### `like-status`
+Kalles fra frontend ved likes. Øker `likes`/`total_likes` via RPC og sender Telegram-varsling med antall likes og meldingsutdrag.
+- Deploy: `supabase functions deploy like-status --no-verify-jwt`
+- Krever CORS-headers (kalles fra nettleser)
+
+### `telegram-webhook`
+Mottar og håndterer alle Telegram-kommandoer.
 - Deploy: `supabase functions deploy telegram-webhook --no-verify-jwt`
 
 ## Miljøvariabler
@@ -107,7 +139,8 @@ npm run dev       # Start dev-server (http://localhost:8080)
 npm run build     # Produksjonsbygg
 npm run lint      # Kjør ESLint
 npm run test      # Kjør tester (vitest)
-supabase functions deploy telegram-webhook --no-verify-jwt  # Deploy Edge Function
+supabase functions deploy telegram-webhook --no-verify-jwt
+supabase functions deploy like-status --no-verify-jwt
 ```
 
 ## Konvensjoner
@@ -116,6 +149,7 @@ supabase functions deploy telegram-webhook --no-verify-jwt  # Deploy Edge Functi
 - Nye UI-komponenter: bruk shadcn/ui fra `src/components/ui/`
 - Ikoner: bruk `lucide-react`
 - Bilder legges i `src/assets/`
+- Analytics: bruk `trackEvent('event_navn')` fra `@/lib/analytics` — aldri direkte Supabase-kall for sporing
 
 ## Viktig
 - `src/components/ui/` er generert av shadcn — unngå manuelle endringer her
