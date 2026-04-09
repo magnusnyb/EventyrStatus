@@ -72,6 +72,8 @@ supabase/
 | likes | integer | Likes på inneværende melding, nullstilles ved ny melding |
 | total_likes | integer | Akkumulert antall likes, nullstilles aldri |
 
+RLS: aktivert. Anon-brukere kan lese (siden er offentlig). Skriving kun via service role (Edge Functions).
+
 ### Tabell: `analytics`
 | Kolonne | Type | Beskrivelse |
 |---|---|---|
@@ -88,7 +90,7 @@ supabase/
 | `click_whatsapp` | Klikk på WhatsApp-knappen |
 | `click_phone` | Klikk på telefonnummeret |
 
-RLS: anon-brukere kan kun inserere, ikke lese.
+RLS: aktivert. Anon-brukere kan kun inserere, ikke lese.
 
 ### Tabell: `status_log`
 | Kolonne | Type | Beskrivelse |
@@ -100,9 +102,23 @@ RLS: anon-brukere kan kun inserere, ikke lese.
 
 Én rad per melding som settes via Telegram. Slettes aldri automatisk — brukes av `/historikk`.
 
+RLS: aktivert. Ingen offentlige policies — kun service role (Edge Functions) har tilgang.
+
+### Tabell: `status_likes`
+| Kolonne | Type | Beskrivelse |
+|---|---|---|
+| ip_hash | text | SHA-256-hash av klientens IP (aldri rå IP) |
+| status_created_at | timestamptz | `created_at` fra gjeldende status — identifiserer hvilken status som ble likt |
+| created_at | timestamptz | Tidspunkt for liken |
+
+Primary key: `(ip_hash, status_created_at)` — forhindrer duplikater på databasenivå.
+RLS: aktivert. Ingen offentlige policies — kun service role (`like-status` edge function) har tilgang.
+
 ### RPC-funksjoner
 - `increment_status_likes()` — øker `likes` og `total_likes` med 1 (kalles av `like-status` edge function)
-- `get_analytics_summary()` — returnerer JSON med sidevisninger (dag/uke/totalt) og klikk per knapp (kalles av `/analytics`-kommandoen)
+- `get_analytics_summary()` — returnerer JSON med sidevisninger (dag/uke/totalt) og klikk per knapp (kalles av `/a`-kommandoen)
+
+**Tilgangskontroll:** Anon- og authenticated-brukere har ikke EXECUTE-rettighet på disse funksjonene. Kun service role (Edge Functions) kan kalle dem.
 
 ## Telegram-bot
 
